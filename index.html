@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RAG 核心原理解析</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              // Ali-Cloud inspired palette
+              primary: '#1677ff', // Ali Blue
+              'primary-bg': '#e6f4ff',
+              secondary: '#fa8c16', // Ali Orange
+              success: '#52c41a',
+              text: {
+                main: '#1f2329',
+                secondary: '#8c8c8c',
+                tertiary: '#bfbfbf'
+              },
+              bg: {
+                page: '#f0f2f5',
+                card: '#ffffff'
+              },
+              surface: '#ffffff',
+            },
+            fontFamily: {
+              hand: ['"Architects Daughter"', 'cursive'],
+              sans: ['"Inter"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+            },
+            boxShadow: {
+              'ali': '0 2px 8px rgba(0, 0, 0, 0.08)',
+              'ali-hover': '0 4px 16px rgba(0, 0, 0, 0.12)',
+            },
+            animation: {
+              'dash': 'dash 1.5s linear infinite',
+            },
+            keyframes: {
+              dash: {
+                to: {
+                  strokeDashoffset: '-20',
+                },
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Inter:wght@300;400;500;600&display=swap');
+      
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f0f2f5;
+        color: #1f2329;
+        overflow-x: hidden;
+      }
+
+      /* Hand-drawn border effect class */
+      .sketchy-box {
+        border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+        border: 2px solid #1f2329;
+      }
+      
+      .sketchy-box-sm {
+         border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+      }
+
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent; 
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #bfbfbf; 
+        border-radius: 3px;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "framer-motion": "https://aistudiocdn.com/framer-motion@^12.23.24",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
