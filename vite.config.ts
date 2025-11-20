@@ -8,12 +8,23 @@ export default defineConfig(({ mode }) => {
       server: {
         port: 3000,
         host: '0.0.0.0',
+        proxy: {
+          '/api/qianwen': {
+            target: 'https://dashscope.aliyuncs.com',
+            changeOrigin: true,
+            rewrite: (path) => path.replace(/^\/api\/qianwen/, ''),
+            configure: (proxy, _options) => {
+              proxy.on('proxyReq', (proxyReq, req, _res) => {
+                const apiKey = req.headers['x-api-key'];
+                if (apiKey) {
+                  proxyReq.setHeader('Authorization', `Bearer ${apiKey}`);
+                }
+              });
+            }
+          }
+        }
       },
       plugins: [react()],
-      define: {
-        'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
-      },
       resolve: {
         alias: {
           '@': path.resolve(__dirname, '.'),

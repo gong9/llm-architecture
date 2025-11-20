@@ -9,7 +9,7 @@ interface StageCardProps {
 
 export const StageCard: React.FC<StageCardProps> = ({ data }) => {
   if (!data) return (
-    <div className="h-full w-full flex flex-col items-center justify-center text-slate-300 p-8 bg-white rounded-xl border border-slate-100 shadow-ali">
+    <div className="h-full w-full flex flex-col items-center justify-center text-slate-300 p-8 bg-white rounded-xl border border-slate-100 shadow-ali min-h-[300px]">
       <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
         <ArrowRight className="text-slate-300" />
       </div>
@@ -28,8 +28,8 @@ export const StageCard: React.FC<StageCardProps> = ({ data }) => {
       transition={{ duration: 0.3 }}
       className="h-full bg-white rounded-xl border border-slate-100 shadow-ali flex flex-col overflow-hidden"
     >
-      {/* Header */}
-      <div className="p-6 border-b border-slate-100 flex items-center gap-4 bg-slate-50/50">
+      {/* Header - flex-none 防止被压缩 */}
+      <div className="p-6 border-b border-slate-100 flex items-center gap-4 bg-slate-50/50 flex-none">
         <div className={`p-3 rounded-lg border ${isAdvanced ? 'bg-secondary/10 text-secondary border-secondary/20' : 'bg-primary-bg text-primary border-primary/10'}`}>
           <data.icon size={24} />
         </div>
@@ -42,11 +42,11 @@ export const StageCard: React.FC<StageCardProps> = ({ data }) => {
         </div>
       </div>
 
-      {/* Content */}
-      <div className="p-6 pb-10 flex-1 overflow-y-auto flex flex-col gap-6">
+      {/* Content - flex-1 和 min-h-0 确保滚动生效 */}
+      <div className="p-6 flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-6 min-h-0">
         
         {/* Section 1: Function */}
-        <div>
+        <div className="flex-none">
           <h3 className="text-sm font-semibold text-text-main mb-3 flex items-center gap-2 uppercase tracking-wider">
             <span className={`w-1 h-4 rounded-full ${isAdvanced ? 'bg-secondary' : 'bg-primary'}`}></span>
             {isAdvanced ? '技术原理' : '核心逻辑'}
@@ -57,7 +57,7 @@ export const StageCard: React.FC<StageCardProps> = ({ data }) => {
         </div>
 
         {/* Section 2: Breakdown (Grid) */}
-        <div>
+        <div className="flex-none">
            <h3 className="text-sm font-semibold text-text-main mb-3 flex items-center gap-2 uppercase tracking-wider">
              <span className={`w-1 h-4 rounded-full ${isAdvanced ? 'bg-primary' : 'bg-secondary'}`}></span>
              {isAdvanced ? '关键技术点' : '包含组件'}
@@ -73,28 +73,13 @@ export const StageCard: React.FC<StageCardProps> = ({ data }) => {
         </div>
 
         {/* Section 3: Example */}
-        <div className={`rounded-lg p-4 border border-dashed relative group ${isAdvanced ? 'bg-secondary/5 border-secondary/20' : 'bg-primary-bg/30 border-primary/20'}`}>
+        <div className={`flex-none rounded-lg p-4 border border-dashed relative group ${isAdvanced ? 'bg-secondary/5 border-secondary/20' : 'bg-primary-bg/30 border-primary/20'}`}>
            <div className={`absolute -top-2 -left-2 px-2 text-xs font-hand font-bold border rounded transform -rotate-3 bg-white ${isAdvanced ? 'text-secondary border-secondary/20' : 'text-primary border-primary/20'}`}>
              Scene Example
            </div>
            <p className="font-hand text-text-main text-sm mt-1">
              "{data.details.example}"
            </p>
-        </div>
-
-        {/* Section 4: Tools */}
-        <div className="mt-auto pt-4">
-           <h3 className="text-xs font-semibold text-text-secondary mb-3 flex items-center gap-2">
-             <Wrench size={12} />
-             RECOMMENDED STACK
-           </h3>
-           <div className="flex flex-wrap gap-2">
-             {data.details.tools.map((tool, idx) => (
-               <span key={idx} className="px-2.5 py-1 rounded-md bg-slate-100 text-text-secondary text-xs border border-slate-200 font-medium">
-                 {tool}
-               </span>
-             ))}
-           </div>
         </div>
 
       </div>

@@ -10,16 +10,17 @@ import {
   Waypoints, 
   MessageSquareCode, 
   FolderArchive, 
-  Workflow
+  Workflow,
+  BookOpen,
+  Zap
 } from 'lucide-react';
 import { RagVisualizer } from './components/RagVisualizer';
 import { StageCard } from './components/StageCard';
 import { AdvancedSection } from './components/AdvancedSection';
+import { ProcessFlow } from './components/ProcessFlow';
 import { RagStep, DisplayData } from './types';
 
-// --- Data Definitions ---
-
-// 1. Core Pipeline Data
+// ... (Data Definitions 保持不变) ...
 const coreStages: Record<RagStep, DisplayData | null> = {
   [RagStep.IDLE]: null,
   [RagStep.CHUNKING]: {
@@ -94,7 +95,6 @@ const coreStages: Record<RagStep, DisplayData | null> = {
   }
 };
 
-// 2. Advanced Features Data
 const advancedFeatures: DisplayData[] = [
   {
     id: 'HYBRID_SEARCH',
@@ -157,9 +157,10 @@ const advancedFeatures: DisplayData[] = [
 const stepOrder = [RagStep.CHUNKING, RagStep.EMBEDDING, RagStep.VECTOR_STORE, RagStep.RERANK, RagStep.GENERATION];
 
 const App: React.FC = () => {
-  const [currentStep, setCurrentStep] = useState<RagStep>(RagStep.IDLE);
+  const [currentStep, setCurrentStep] = useState<RagStep>(RagStep.CHUNKING);
   const [selectedFeatureId, setSelectedFeatureId] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [activeTab, setActiveTab] = useState<'architecture' | 'demo'>('architecture');
 
   // Playback logic
   useEffect(() => {
@@ -167,7 +168,6 @@ const App: React.FC = () => {
     let timeout: ReturnType<typeof setTimeout>;
 
     const playSequence = async () => {
-       // Reset selection when playing
        setSelectedFeatureId(null);
        
        if (currentStep === RagStep.IDLE || currentStep === RagStep.GENERATION) {
@@ -193,24 +193,18 @@ const App: React.FC = () => {
     return () => clearTimeout(timeout);
   }, [isPlaying]);
 
-  // Handle Step Click from Visualizer
   const handleStepClick = (step: RagStep) => {
     setIsPlaying(false);
-    setSelectedFeatureId(null); // Deselect advanced feature
+    setSelectedFeatureId(null);
     setCurrentStep(step);
   };
 
-  // Handle Advanced Feature Click
   const handleFeatureClick = (feature: DisplayData) => {
     setIsPlaying(false);
-    setCurrentStep(RagStep.IDLE); // Deselect core pipeline
+    setCurrentStep(RagStep.IDLE);
     setSelectedFeatureId(feature.id);
   };
 
-  // Determine what to display in the StageCard
-  // 1. If an Advanced Feature is selected, show that.
-  // 2. Else if a Core Step is selected, show that.
-  // 3. Else show nothing (or prompt)
   let displayData: DisplayData | null = null;
   
   if (selectedFeatureId) {
@@ -222,66 +216,101 @@ const App: React.FC = () => {
   return (
     <div className="h-screen w-screen bg-bg-page text-text-main flex flex-col overflow-hidden font-sans selection:bg-primary selection:text-white">
       
-      {/* 1. Navbar (Minimal) */}
-      <header className="h-14 flex-none bg-white border-b border-slate-200 flex items-center justify-between px-6 shadow-sm z-50">
-        <div className="flex items-center gap-3">
-           <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white shadow-lg shadow-primary/30">
-             <span className="font-hand font-bold text-lg">R</span>
+      {/* 1. Navbar (Minimal) - 移动端优化 */}
+      <header className="h-14 flex-none bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-6 shadow-sm z-50">
+        <div className="flex items-center gap-3 md:gap-6">
+           <div className="flex items-center gap-2 md:gap-3">
+             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white shadow-lg shadow-primary/30 flex-none">
+               <span className="font-hand font-bold text-lg">R</span>
+             </div>
+             <h1 className="hidden md:block font-bold text-lg text-text-main tracking-tight">RAG <span className="font-normal text-text-tertiary">Master Class</span></h1>
            </div>
-           <h1 className="font-bold text-lg text-text-main tracking-tight">RAG <span className="font-normal text-text-tertiary">Core Architecture</span></h1>
+           
+           {/* Tab 切换 - 移动端只显示图标 */}
+           <div className="flex items-center gap-1 bg-slate-100/80 p-1 rounded-lg">
+             <button
+               onClick={() => setActiveTab('architecture')}
+               className={`flex items-center gap-1.5 px-3 md:px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
+                 activeTab === 'architecture'
+                   ? 'bg-white text-primary shadow-sm'
+                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+               }`}
+             >
+               <BookOpen size={15} />
+               <span className="hidden md:inline">架构说明</span>
+             </button>
+             <button
+               onClick={() => setActiveTab('demo')}
+               className={`flex items-center gap-1.5 px-3 md:px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
+                 activeTab === 'demo'
+                   ? 'bg-white text-primary shadow-sm'
+                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+               }`}
+             >
+               <Zap size={15} />
+               <span className="hidden md:inline">可视化演示</span>
+             </button>
+           </div>
         </div>
         
         <div className="flex items-center gap-4">
-           <div className="text-xs text-text-tertiary font-medium px-3 py-1 bg-slate-100 rounded-full hidden sm:block">
-             Minimal Viable Version
-           </div>
-           <button 
-             onClick={() => isPlaying ? setIsPlaying(false) : setIsPlaying(true)}
-             className={`
-               flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all
-               ${isPlaying 
-                 ? 'bg-secondary/10 text-secondary border border-secondary/20' 
-                 : 'bg-primary text-white hover:bg-blue-600 shadow-lg shadow-primary/30'
-               }
-             `}
-           >
-             {isPlaying ? <><Pause size={14} /> 暂停演示</> : <><Play size={14} /> 运行流程</>}
-           </button>
+           {activeTab === 'architecture' && (
+             <button 
+               onClick={() => isPlaying ? setIsPlaying(false) : setIsPlaying(true)}
+               className={`
+                 flex items-center gap-2 px-3 md:px-4 py-1.5 rounded-full text-sm font-medium transition-all
+                 ${isPlaying 
+                   ? 'bg-secondary/10 text-secondary border border-secondary/20' 
+                   : 'bg-primary text-white hover:bg-blue-600 shadow-lg shadow-primary/30'
+                 }
+               `}
+             >
+               {isPlaying ? <><Pause size={14} /> <span className="hidden md:inline">暂停</span></> : <><Play size={14} /> <span className="hidden md:inline">运行</span></>}
+             </button>
+           )}
         </div>
       </header>
 
-      {/* 2. Main Content - Dashboard Grid */}
-      {/* Grid: Top row (Visualizer) fixed height 40%, Bottom row (Details) remaining space */}
-      <main className="flex-1 grid grid-rows-[40%_1fr] p-4 gap-4 overflow-hidden max-w-[1600px] mx-auto w-full">
-        
-        {/* Top Panel: Visualizer */}
-        <section className="bg-white rounded-2xl border border-slate-200 shadow-ali relative overflow-hidden flex flex-col">
-           <RagVisualizer 
-              currentStep={currentStep} 
-              onStepClick={handleStepClick} 
-              selectedFeatureId={selectedFeatureId}
-           />
-        </section>
+      {/* 2. Main Content - Dashboard Grid - 移动端适配 */}
+      <main className="flex-1 p-2 md:p-4 overflow-hidden max-w-[1600px] mx-auto w-full">
+        {activeTab === 'architecture' ? (
+          /* 架构说明模式 - 移动端改为垂直流式布局 */
+          <div className="grid grid-rows-[auto_1fr] md:grid-rows-[32%_1fr] gap-4 h-full overflow-y-auto md:overflow-hidden">
+            
+            {/* Top Panel: Visualizer */}
+            <section className="bg-white rounded-2xl border border-slate-200 shadow-ali relative flex flex-col min-h-[250px] md:min-h-0 overflow-hidden flex-none">
+               <RagVisualizer 
+                  currentStep={currentStep} 
+                  onStepClick={handleStepClick} 
+                  selectedFeatureId={selectedFeatureId}
+               />
+            </section>
 
-        {/* Bottom Panel: Split View */}
-        <section className="grid grid-cols-1 md:grid-cols-12 gap-4 h-full overflow-hidden">
-          
-          {/* Left: Detail Card (7/12 width) */}
-          <div className="md:col-span-7 lg:col-span-8 h-full">
-             <StageCard data={displayData} />
+            {/* Bottom Panel: Split View - 移动端垂直堆叠 */}
+            <section className="flex flex-col md:grid md:grid-cols-12 gap-4 min-h-0 md:h-full overflow-visible md:overflow-hidden">
+              
+              {/* Left: Detail Card */}
+              <div className="flex-none md:col-span-7 lg:col-span-8 h-auto md:h-full overflow-visible md:overflow-hidden">
+                 <StageCard data={displayData} />
+              </div>
+
+              {/* Right: Advanced Features */}
+              <div className="flex-none md:col-span-5 lg:col-span-4 h-auto md:h-full pb-4 md:pb-0 overflow-visible md:overflow-hidden">
+                 <AdvancedSection 
+                    features={advancedFeatures} 
+                    selectedId={selectedFeatureId} 
+                    onSelect={handleFeatureClick} 
+                 />
+              </div>
+
+            </section>
           </div>
-
-          {/* Right: Advanced Features (5/12 width) */}
-          <div className="md:col-span-5 lg:col-span-4 h-full">
-             <AdvancedSection 
-                features={advancedFeatures} 
-                selectedId={selectedFeatureId} 
-                onSelect={handleFeatureClick} 
-             />
+        ) : (
+          /* 流程化演示模式 */
+          <div className="h-full overflow-hidden">
+            <ProcessFlow />
           </div>
-
-        </section>
-
+        )}
       </main>
     </div>
   );
