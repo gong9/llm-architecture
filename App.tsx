@@ -12,7 +12,8 @@ import {
   FolderArchive, 
   Workflow,
   BookOpen,
-  Zap
+  Zap,
+  Github // 引入 Github 图标
 } from 'lucide-react';
 import { RagVisualizer } from './components/RagVisualizer';
 import { StageCard } from './components/StageCard';
@@ -254,6 +255,17 @@ const App: React.FC = () => {
         </div>
         
         <div className="flex items-center gap-4">
+           {/* GitHub Link */}
+           <a 
+             href="https://github.com/gong9/llm-architecture" 
+             target="_blank" 
+             rel="noopener noreferrer"
+             className="p-2 text-slate-400 hover:text-slate-900 hover:bg-slate-50 rounded-full transition-colors"
+             title="View on GitHub"
+           >
+             <Github size={20} />
+           </a>
+
            {activeTab === 'architecture' && (
              <button 
                onClick={() => isPlaying ? setIsPlaying(false) : setIsPlaying(true)}
